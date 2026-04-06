@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Rifa — Renova-me São Pedro</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #C9A84C; --gold-light: #F0D080; --gold-dark: #8B6914;
+    --cream: #FDF6E3; --brown: #3D2B1F; --brown-light: #6B4C3B;
+    --green: #2E7D32; --green-light: #81C784;
+    --red: #C62828; --red-light: #EF9A9A;
+    --blue: #1565C0; --blue-light: #90CAF9;
+    --shadow: 0 4px 24px rgba(61,43,31,0.12);
+    --shadow-lg: 0 8px 40px rgba(61,43,31,0.18);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--brown); min-height:100vh; padding-bottom:80px; }
+
+/* LOGIN */
+#login-screen {
+position:fixed; inset:0; background:linear-gradient(160deg,var(–brown) 0%,var(–brown-light) 100%);
+display:flex; flex-direction:column; align-items:center; justify-content:center;
+z-index:999; padding:32px 24px;
+}
+.login-cross { font-size:32px; color:var(–gold-light); letter-spacing:12px; margin-bottom:12px; }
+.login-title { font-family:‘Playfair Display’,serif; font-size:28px; color:var(–gold-light); font-weight:900; text-align:center; margin-bottom:4px; }
+.login-sub { font-size:12px; color:rgba(255,255,255,0.5); letter-spacing:3px; text-transform:uppercase; margin-bottom:40px; }
+.login-card { background:rgba(255,255,255,0.06); border:1px solid rgba(201,168,76,0.3); border-radius:20px; padding:28px 24px; width:100%; max-width:360px; }
+.login-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:2px; color:var(–gold-light); margin-bottom:8px; }
+.login-select, .login-input {
+width:100%; padding:14px 16px; border-radius:12px; border:2px solid rgba(201,168,76,0.4);
+background:rgba(255,255,255,0.08); font-family:‘DM Sans’,sans-serif; font-size:16px;
+color:#fff; margin-bottom:16px; appearance:none;
+}
+.login-select option { background:var(–brown); color:#fff; }
+.mode-toggle { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:20px; }
+.mode-btn { padding:12px; border-radius:12px; border:2px solid rgba(201,168,76,0.3); background:transparent; color:rgba(255,255,255,0.6); font-family:‘DM Sans’,sans-serif; font-size:13px; font-weight:600; cursor:pointer; transition:all 0.2s; text-align:center; }
+.mode-btn.active { background:rgba(201,168,76,0.2); border-color:var(–gold); color:var(–gold-light); }
+.btn-entrar { width:100%; padding:16px; border-radius:14px; border:none; background:linear-gradient(135deg,var(–gold-dark),var(–gold)); color:#fff; font-family:‘Playfair Display’,serif; font-size:18px; font-weight:700; cursor:pointer; box-shadow:0 4px 20px rgba(139,105,20,0.4); }
+
+/* HEADER */
+.header { background:linear-gradient(135deg,var(–brown) 0%,var(–brown-light) 100%); padding:16px 16px 12px; text-align:center; position:sticky; top:0; z-index:100; box-shadow:var(–shadow-lg); }
+.header-cross { font-size:14px; color:var(–gold-light); letter-spacing:6px; margin-bottom:2px; }
+.header h1 { font-family:‘Playfair Display’,serif; font-size:18px; color:var(–gold-light); font-weight:900; }
+.header-sub { font-size:10px; color:rgba(255,255,255,0.5); margin-top:1px; letter-spacing:2px; text-transform:uppercase; }
+.header-user { font-size:11px; color:var(–gold); margin-top:4px; font-weight:600; }
+.btn-sair { position:absolute; right:12px; top:50%; transform:translateY(-50%); background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:rgba(255,255,255,0.7); border-radius:8px; padding:6px 10px; font-size:11px; cursor:pointer; font-family:‘DM Sans’,sans-serif; }
+
+/* STATS */
+.stats-bar { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; padding:12px 12px 0; }
+.stat-card { background:#fff; border-radius:14px; padding:12px 8px; text-align:center; box-shadow:var(–shadow); border:1.5px solid transparent; }
+.stat-card.green { border-color:var(–green-light); background:#F1F8F1; }
+.stat-card.red   { border-color:var(–red-light);   background:#FFF1F1; }
+.stat-card.gold  { border-color:var(–gold);        background:#FFFBF0; }
+.stat-num { font-family:‘Playfair Display’,serif; font-size:24px; font-weight:700; line-height:1; }
+.stat-card.green .stat-num { color:var(–green); }
+.stat-card.red   .stat-num { color:var(–red); }
+.stat-card.gold  .stat-num { color:var(–gold-dark); }
+.stat-label { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:1px; color:var(–brown-light); margin-top:3px; }
+
+/* PROGRESS */
+.progress-wrap { padding:10px 12px 0; }
+.progress-bar-bg { background:#E8DCC8; border-radius:99px; height:10px; overflow:hidden; }
+.progress-bar-fill { height:100%; background:linear-gradient(90deg,var(–gold-dark),var(–gold)); border-radius:99px; transition:width 0.5s ease; }
+.progress-label { display:flex; justify-content:space-between; font-size:10px; color:var(–brown-light); margin-top:4px; font-weight:500; }
+
+/* SECTION */
+.section { padding:12px 12px 0; }
+.section-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:2px; color:var(–gold-dark); margin-bottom:8px; display:flex; align-items:center; gap:6px; }
+.section-title::after { content:’’; flex:1; height:1px; background:var(–gold-light); }
+
+/* TABS */
+.tabs { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; padding:10px 12px 0; }
+.tab-btn { padding:10px 4px; border:2px solid var(–gold-light); background:#fff; border-radius:12px; font-family:‘DM Sans’,sans-serif; font-size:12px; font-weight:600; color:var(–brown-light); cursor:pointer; transition:all 0.2s; }
+.tab-btn.active { background:var(–brown); border-color:var(–brown); color:var(–gold-light); }
+
+/* SEARCH */
+.search-wrap { padding:8px 12px 0; position:relative; }
+.search-input { width:100%; padding:12px 14px 12px 40px; border-radius:12px; border:2px solid var(–gold-light); background:#fff; font-family:‘DM Sans’,sans-serif; font-size:15px; color:var(–brown); box-shadow:var(–shadow); }
+.search-icon { position:absolute; left:24px; top:50%; transform:translateY(-50%); font-size:16px; pointer-events:none; }
+
+/* LEGEND */
+.legend { display:flex; flex-wrap:wrap; gap:8px; padding:8px 12px 0; }
+.legend-item { display:flex; align-items:center; gap:5px; font-size:11px; color:var(–brown-light); font-weight:500; }
+.legend-dot { width:14px; height:14px; border-radius:4px; }
+
+/* GRID */
+.grid-wrap { padding:8px 12px 0; }
+.numbers-grid { display:grid; grid-template-columns:repeat(8,1fr); gap:5px; }
+.num-btn { aspect-ratio:1; border-radius:8px; border:none; font-family:‘DM Sans’,sans-serif; font-size:11px; font-weight:700; cursor:pointer; transition:all 0.15s; display:flex; align-items:center; justify-content:center; }
+.num-btn.livre    { background:#fff; color:var(–brown); border:1.5px solid #E0D5C0; }
+.num-btn.livre:hover { background:var(–gold-light); border-color:var(–gold); transform:scale(1.08); }
+.num-btn.vendido  { background:var(–green); color:#fff; border:1.5px solid var(–green); cursor:pointer; }
+.num-btn.meu      { background:var(–blue); color:#fff; border:1.5px solid var(–blue); cursor:pointer; }
+.num-btn.viewer   { cursor:default !important; }
+.num-btn.viewer.livre:hover { transform:none; background:#fff; border-color:#E0D5C0; }
+
+/* MODAL VENDER */
+.modal-overlay { position:fixed; inset:0; background:rgba(61,43,31,0.7); z-index:200; display:flex; align-items:flex-end; opacity:0; pointer-events:none; transition:opacity 0.25s; }
+.modal-overlay.open { opacity:1; pointer-events:all; }
+.modal { background:var(–cream); border-radius:24px 24px 0 0; padding:20px 20px 36px; width:100%; transform:translateY(100%); transition:transform 0.3s cubic-bezier(.4,0,.2,1); box-shadow:0 -8px 40px rgba(61,43,31,0.2); }
+.modal-overlay.open .modal { transform:translateY(0); }
+.modal-handle { width:40px; height:4px; background:var(–gold-light); border-radius:99px; margin:0 auto 16px; }
+.modal-num { font-family:‘Playfair Display’,serif; font-size:52px; font-weight:900; text-align:center; color:var(–brown); line-height:1; margin-bottom:4px; }
+.modal-subtitle { text-align:center; font-size:11px; color:var(–brown-light); margin-bottom:16px; font-weight:500; letter-spacing:1px; text-transform:uppercase; }
+.modal-input { width:100%; padding:13px 16px; border-radius:14px; border:2px solid var(–gold-light); background:#fff; font-family:‘DM Sans’,sans-serif; font-size:15px; color:var(–brown); margin-bottom:10px; box-shadow:var(–shadow); }
+.modal-input:focus { outline:none; border-color:var(–gold); }
+.modal-input::placeholder { color:#B0A090; }
+.btn-vender { width:100%; padding:15px; border-radius:14px; border:none; background:linear-gradient(135deg,var(–gold-dark),var(–gold)); color:#fff; font-family:‘Playfair Display’,serif; font-size:17px; font-weight:700; cursor:pointer; box-shadow:var(–shadow-lg); margin-top:4px; }
+.btn-cancelar { width:100%; padding:12px; border-radius:14px; border:2px solid var(–gold-light); background:transparent; color:var(–brown-light); font-family:‘DM Sans’,sans-serif; font-size:15px; font-weight:600; cursor:pointer; margin-top:8px; }
+
+/* COMPROVANTE */
+.comprovante-box { background:#fff; border-radius:16px; border:2px dashed var(–gold); padding:16px; margin-bottom:12px; text-align:center; }
+.comp-title { font-family:‘Playfair Display’,serif; font-size:14px; font-weight:700; color:var(–brown); }
+.comp-num { font-family:‘Playfair Display’,serif; font-size:48px; font-weight:900; color:var(–gold-dark); line-height:1; }
+.comp-detail { font-size:12px; color:var(–brown-light); margin-top:4px; }
+.btn-whats { width:100%; padding:13px; border-radius:14px; border:none; background:#25D366; color:#fff; font-family:‘DM Sans’,sans-serif; font-size:15px; font-weight:700; cursor:pointer; margin-top:4px; display:flex; align-items:center; justify-content:center; gap:8px; }
+
+/* INFO MODAL */
+.info-row { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #EDE0C8; }
+.info-row:last-child { border-bottom:none; }
+.info-key { font-size:12px; color:var(–brown-light); font-weight:500; }
+.info-val { font-size:13px; font-weight:700; color:var(–brown); }
+.btn-estornar { width:100%; padding:13px; border-radius:14px; border:2px solid var(–red); background:transparent; color:var(–red); font-family:‘DM Sans’,sans-serif; font-size:14px; font-weight:700; cursor:pointer; margin-top:10px; }
+
+/* RELATORIO */
+.vend-card { background:#fff; border-radius:14px; padding:14px; margin-bottom:8px; box-shadow:var(–shadow); border-left:4px solid var(–gold); display:flex; justify-content:space-between; align-items:center; }
+.vend-name { font-size:15px; font-weight:700; color:var(–brown); }
+.vend-count { font-size:12px; color:var(–brown-light); margin-top:2px; }
+.vend-total { font-family:‘Playfair Display’,serif; font-size:18px; font-weight:700; color:var(–green); }
+
+/* CONFIG */
+.cfg-card { background:#fff; border-radius:16px; padding:16px; box-shadow:var(–shadow); margin-bottom:12px; }
+.cfg-label { font-size:11px; font-weight:700; color:var(–brown-light); text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; }
+.vendedor-row { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #EDE0C8; }
+.vendedor-row:last-child { border-bottom:none; }
+.btn-rm { background:none; border:none; cursor:pointer; font-size:16px; color:var(–red); }
+.add-row { display:flex; gap:8px; margin-top:10px; }
+.btn-add { padding:13px 16px; border-radius:12px; border:none; background:linear-gradient(135deg,var(–gold-dark),var(–gold)); color:#fff; font-size:18px; font-weight:700; cursor:pointer; }
+.danger-zone { background:#FFF1F1; border-radius:16px; padding:16px; border:1.5px solid var(–red-light); margin-bottom:12px; }
+.btn-reset { width:100%; padding:12px; border-radius:12px; border:2px solid var(–red); background:transparent; color:var(–red); font-family:‘DM Sans’,sans-serif; font-size:14px; font-weight:600; cursor:pointer; }
+
+/* TOAST */
+.toast { position:fixed; bottom:90px; left:50%; transform:translateX(-50%) translateY(20px); background:var(–brown); color:var(–gold-light); padding:11px 18px; border-radius:14px; font-size:13px; font-weight:600; z-index:300; opacity:0; transition:all 0.3s; white-space:nowrap; box-shadow:var(–shadow-lg); }
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+.toast.error   { background:var(–red); color:#fff; }
+.toast.success { background:var(–green); color:#fff; }
+
+/* SYNC */
+.sync-dot { display:inline-block; width:7px; height:7px; border-radius:50%; background:#aaa; margin-right:4px; transition:background 0.3s; }
+.sync-dot.on { background:#4CAF50; }
+.sync-dot.err { background:var(–red); }
+
+/* BOTTOM NAV */
+.bottom-nav { position:fixed; bottom:0; left:0; right:0; background:var(–brown); display:grid; grid-template-columns:repeat(3,1fr); z-index:150; box-shadow:0 -4px 20px rgba(61,43,31,0.2); }
+.nav-btn { padding:11px 8px; background:none; border:none; cursor:pointer; text-align:center; transition:background 0.2s; }
+.nav-btn.active { background:rgba(201,168,76,0.15); }
+.nav-icon { font-size:20px; }
+.nav-label { font-size:10px; font-weight:600; color:rgba(255,255,255,0.5); letter-spacing:1px; margin-top:1px; text-transform:uppercase; }
+.nav-btn.active .nav-label { color:var(–gold-light); }
+
+.page { display:none; }
+.page.active { display:block; }
+
+.empty-state { text-align:center; padding:40px 20px; color:var(–brown-light); }
+.empty-icon { font-size:40px; margin-bottom:10px; }
+
+/* VIEWER BANNER */
+.viewer-banner { background:#E3F2FD; border:1.5px solid var(–blue-light); border-radius:12px; padding:10px 14px; margin:10px 12px 0; font-size:12px; color:var(–blue); font-weight:600; text-align:center; }
+
+/* LOADING */
+.loading { text-align:center; padding:40px; color:var(–brown-light); font-size:14px; }
+.spinner { width:32px; height:32px; border:3px solid var(–gold-light); border-top-color:var(–gold-dark); border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 12px; }
+@keyframes spin { to { transform:rotate(360deg); } }
+</style>
+
+</head>
+<body>
+
+<!-- LOGIN -->
+
+<div id="login-screen">
+  <div class="login-cross">✦ ✝ ✦</div>
+  <div class="login-title">Renova-me São Pedro</div>
+  <div class="login-sub">Rifa EJC</div>
+  <div class="login-card">
+    <div class="login-label">Você é:</div>
+    <div class="mode-toggle">
+      <button class="mode-btn active" onclick="setMode('vendedor',this)">🎟️ Vendedor</button>
+      <button class="mode-btn" onclick="setMode('comprador',this)">👁️ Ver números</button>
+    </div>
+    <div id="login-vendedor-wrap">
+      <div class="login-label">Seu nome</div>
+      <select class="login-select" id="login-select">
+        <option value="">— Selecione —</option>
+      </select>
+    </div>
+    <button class="btn-entrar" onclick="entrar()">✝ Entrar</button>
+  </div>
+</div>
+
+<!-- HEADER -->
+
+<div class="header" style="position:relative">
+  <div class="header-cross">✦ ✝ ✦</div>
+  <h1>Renova-me São Pedro</h1>
+  <div class="header-sub"><span class="sync-dot" id="sync-dot"></span>Rifa EJC — Tempo Real</div>
+  <div class="header-user" id="header-user"></div>
+  <button class="btn-sair" onclick="sair()">Sair</button>
+</div>
+
+<!-- PAGE: NÚMEROS -->
+
+<div class="page active" id="page-numeros">
+  <div class="stats-bar">
+    <div class="stat-card green"><div class="stat-num" id="stat-vendidos">0</div><div class="stat-label">Vendidos</div></div>
+    <div class="stat-card red"><div class="stat-num" id="stat-livres">—</div><div class="stat-label">Livres</div></div>
+    <div class="stat-card gold"><div class="stat-num" id="stat-valor">R$0</div><div class="stat-label">Arrecadado</div></div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-fill" style="width:0%"></div></div>
+    <div class="progress-label"><span id="progress-pct">0% da meta</span><span id="progress-meta">Meta: 700</span></div>
+  </div>
+  <div id="viewer-banner" class="viewer-banner" style="display:none">👁️ Modo visualização — escolha seu número favorito e fale com um vendedor!</div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="setFilter('todos',this)">Todos</button>
+    <button class="tab-btn" onclick="setFilter('livres',this)">Livres</button>
+    <button class="tab-btn" onclick="setFilter('meus',this)" id="tab-meus">Meus</button>
+  </div>
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input class="search-input" type="number" id="search-input" placeholder="Buscar número..." oninput="renderGrid()">
+  </div>
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#fff;border:1.5px solid #E0D5C0"></div>Livre</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#2E7D32"></div>Vendido</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#1565C0"></div>Meu</div>
+  </div>
+  <div class="grid-wrap">
+    <div id="loading-grid" class="loading"><div class="spinner"></div>Conectando...</div>
+    <div class="numbers-grid" id="numbers-grid" style="display:none"></div>
+  </div>
+</div>
+
+<!-- PAGE: RELATÓRIO -->
+
+<div class="page" id="page-relatorio">
+  <div class="section"><div class="section-title">Ranking de vendedores</div></div>
+  <div id="relatorio-list" style="padding:0 12px"></div>
+</div>
+
+<!-- PAGE: CONFIG -->
+
+<div class="page" id="page-config">
+  <div class="section">
+    <div class="section-title">Configurações</div>
+    <div class="cfg-card">
+      <div class="cfg-label">Total de Bilhetes</div>
+      <input class="modal-input" type="number" id="cfg-total" value="700" style="margin:0 0 12px">
+      <div class="cfg-label">Preço por Bilhete (R$)</div>
+      <input class="modal-input" type="number" id="cfg-preco" value="10" style="margin:0">
+      <button class="btn-vender" onclick="applyConfig()" style="margin-top:12px">Salvar</button>
+    </div>
+    <div class="section-title">Vendedores</div>
+    <div class="cfg-card">
+      <div id="vendedor-list-cfg"></div>
+      <div class="add-row">
+        <input class="modal-input" id="new-vendedor-input" placeholder="Nome do vendedor" style="margin:0;flex:1">
+        <button class="btn-add" onclick="addVendedor()">+</button>
+      </div>
+    </div>
+    <div class="danger-zone">
+      <div style="font-size:12px;font-weight:700;color:var(--red);margin-bottom:8px">⚠️ ZONA DE PERIGO</div>
+      <button class="btn-reset" onclick="resetAll()">Resetar todas as vendas</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL VENDER -->
+
+<div class="modal-overlay" id="modal-vender">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-num" id="modal-num-display">—</div>
+    <div class="modal-subtitle">Registrar venda</div>
+    <input class="modal-input" id="comprador-nome" placeholder="Nome do comprador *" autocomplete="off">
+    <input class="modal-input" id="comprador-tel" placeholder="WhatsApp (ex: 11999998888)" type="tel">
+    <button class="btn-vender" onclick="confirmarVenda()">✝ Confirmar Venda</button>
+    <button class="btn-cancelar" onclick="closeModal('modal-vender')">Cancelar</button>
+  </div>
+</div>
+
+<!-- MODAL COMPROVANTE -->
+
+<div class="modal-overlay" id="modal-comprovante">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-subtitle">✅ Venda registrada!</div>
+    <div class="comprovante-box" id="comprovante-box">
+      <div class="comp-title">✝ Renova-me São Pedro ✝</div>
+      <div style="font-size:11px;color:var(--brown-light);margin:2px 0 4px;letter-spacing:1px">RIFA EJC</div>
+      <div class="comp-num" id="comp-num">000</div>
+      <div class="comp-detail" id="comp-nome"></div>
+      <div class="comp-detail" id="comp-vendedor"></div>
+      <div class="comp-detail" id="comp-data"></div>
+    </div>
+    <button class="btn-whats" onclick="enviarWhats()">📲 Enviar comprovante no WhatsApp</button>
+    <button class="btn-cancelar" onclick="closeModal('modal-comprovante')" style="margin-top:8px">Fechar</button>
+  </div>
+</div>
+
+<!-- MODAL INFO -->
+
+<div class="modal-overlay" id="modal-info">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-num" id="info-num-display">—</div>
+    <div class="modal-subtitle">✅ Vendido</div>
+    <div id="info-rows"></div>
+    <button id="btn-estornar" class="btn-estornar" onclick="estornarVenda()">🔄 Liberar número (estorno)</button>
+    <button class="btn-cancelar" onclick="closeModal('modal-info')">Fechar</button>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+
+<div class="bottom-nav">
+  <button class="nav-btn active" onclick="showPage('numeros',this)"><div class="nav-icon">🎟️</div><div class="nav-label">Bilhetes</div></button>
+  <button class="nav-btn" onclick="showPage('relatorio',this)"><div class="nav-icon">📊</div><div class="nav-label">Relatório</div></button>
+  <button class="nav-btn" id="nav-config" onclick="showPage('config',this)"><div class="nav-icon">⚙️</div><div class="nav-label">Config</div></button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- FIREBASE -->
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, set, remove, onValue, get, runTransaction }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCc9om8-hydZj5RR7_kHhhKXKQTItt6fOA",
+  authDomain: "rifa-renovame.firebaseapp.com",
+  databaseURL: "https://rifa-renovame-default-rtdb.firebaseio.com",
+  projectId: "rifa-renovame",
+  storageBucket: "rifa-renovame.firebasestorage.app",
+  messagingSenderId: "987545756312",
+  appId: "1:987545756312:web:e6dc6d504062c6c60ee6ed"
+};
+
+const app = initializeApp(firebaseConfig);
+const db  = getDatabase(app);
+
+// ─── STATE ────────────────────────────────────────────────────
+window._state = {
+  total: 700, preco: 10,
+  vendedores: ["Ana Paula","Bruno","Carla","Daniel","Eduarda","Felipe",
+               "Gabriela","Hugo","Isabela","João","Karina","Lucas","Mariana","Nicolas","Olivia"],
+  bilhetes: {}
+};
+window._session = { nome:'', modo:'vendedor' };
+window._selectedNum = null;
+window._lastVenda = null;
+let currentFilter = 'todos';
+
+// ─── FIREBASE LISTENERS ───────────────────────────────────────
+const dot = document.getElementById('sync-dot');
+
+onValue(ref(db,'config'), snap => {
+  if(snap.exists()){
+    const c = snap.val();
+    window._state.total   = c.total   || 700;
+    window._state.preco   = c.preco   || 10;
+    window._state.vendedores = c.vendedores || window._state.vendedores;
+    document.getElementById('cfg-total').value = window._state.total;
+    document.getElementById('cfg-preco').value = window._state.preco;
+    renderVendedoresCfg();
+    renderVendedorSelect();
+    document.getElementById('progress-meta').textContent = 'Meta: ' + window._state.total;
+  }
+  dot.className = 'sync-dot on';
+}, err => { dot.className = 'sync-dot err'; });
+
+onValue(ref(db,'bilhetes'), snap => {
+  window._state.bilhetes = snap.exists() ? snap.val() : {};
+  document.getElementById('loading-grid').style.display = 'none';
+  document.getElementById('numbers-grid').style.display = 'grid';
+  renderGrid();
+  updateStats();
+  renderRelatorio();
+  dot.className = 'sync-dot on';
+});
+
+// ─── SAVE HELPERS ─────────────────────────────────────────────
+async function saveConfig(){
+  await set(ref(db,'config'),{
+    total: window._state.total,
+    preco: window._state.preco,
+    vendedores: window._state.vendedores
+  });
+}
+
+// ─── VENDA COM TRANSACTION (evita número duplo) ───────────────
+window.confirmarVenda = async function(){
+  const nome = document.getElementById('comprador-nome').value.trim();
+  if(!nome){ showToast('⚠️ Informe o nome do comprador!','error'); return; }
+  const num = window._selectedNum;
+  const vendedor = window._session.nome;
+  const tel = document.getElementById('comprador-tel').value.trim();
+  const ts  = new Date().toLocaleString('pt-BR');
+
+  const numRef = ref(db, 'bilhetes/' + num);
+  try {
+    const result = await runTransaction(numRef, current => {
+      if(current !== null) return; // já vendido — aborta
+      return { comprador: nome, vendedor, tel, ts };
+    });
+    if(!result.committed){
+      showToast('❌ Número já foi vendido por outro vendedor!','error');
+      closeModal('modal-vender');
+      return;
+    }
+    window._lastVenda = { num, nome, vendedor, tel, ts };
+    closeModal('modal-vender');
+    showComprovante(num, nome, vendedor, ts);
+  } catch(e){
+    showToast('❌ Erro ao registrar. Tente novamente.','error');
+  }
+};
+
+window.estornarVenda = async function(){
+  if(!confirm('Liberar o número ' + window._selectedNum + '?')) return;
+  await remove(ref(db,'bilhetes/' + window._selectedNum));
+  closeModal('modal-info');
+  showToast('🔄 Número liberado.');
+};
+
+window.applyConfig = async function(){
+  const t = parseInt(document.getElementById('cfg-total').value);
+  const p = parseInt(document.getElementById('cfg-preco').value);
+  if(!t||!p||t<1||p<1){ showToast('Valores inválidos','error'); return; }
+  window._state.total = t;
+  window._state.preco = p;
+  await saveConfig();
+  showToast('✅ Configurações salvas!','success');
+};
+
+window.addVendedor = async function(){
+  const nome = document.getElementById('new-vendedor-input').value.trim();
+  if(!nome) return;
+  if(window._state.vendedores.includes(nome)){ showToast('Vendedor já existe!','error'); return; }
+  window._state.vendedores.push(nome);
+  document.getElementById('new-vendedor-input').value='';
+  await saveConfig();
+  showToast('✅ ' + nome + ' adicionado!','success');
+};
+
+window.removeVendedor = async function(nome){
+  window._state.vendedores = window._state.vendedores.filter(v=>v!==nome);
+  await saveConfig();
+};
+
+window.resetAll = async function(){
+  if(!confirm('Apagar TODAS as vendas? Isso não pode ser desfeito!')) return;
+  await remove(ref(db,'bilhetes'));
+  showToast('🔄 Dados resetados.','error');
+};
+
+// ─── RENDER ───────────────────────────────────────────────────
+window.renderGrid = function(){
+  const grid = document.getElementById('numbers-grid');
+  const isViewer = window._session.modo === 'comprador';
+  const vendedor = window._session.nome;
+  const search = document.getElementById('search-input').value.trim();
+  grid.innerHTML = '';
+
+  for(let i=1; i<=window._state.total; i++){
+    const b = window._state.bilhetes[i];
+    const isMeu = b && b.vendedor === vendedor && !isViewer;
+    const isVendido = !!b;
+
+    if(search && !String(i).includes(search)) continue;
+    if(currentFilter==='livres' && isVendido) continue;
+    if(currentFilter==='meus'   && !isMeu)    continue;
+
+    const btn = document.createElement('button');
+    btn.className = 'num-btn ' + (isMeu?'meu':isVendido?'vendido':'livre') + (isViewer?' viewer':'');
+    btn.textContent = i;
+    btn.onclick = ()=> isViewer ? viewerClick(i) : clickNum(i);
+    grid.appendChild(btn);
+  }
+};
+
+window.updateStats = function(){
+  const vendidos = Object.keys(window._state.bilhetes).length;
+  const livres   = window._state.total - vendidos;
+  const valor    = vendidos * window._state.preco;
+  document.getElementById('stat-vendidos').textContent = vendidos;
+  document.getElementById('stat-livres').textContent   = livres;
+  document.getElementById('stat-valor').textContent    = valor>=1000 ? 'R$'+(valor/1000).toFixed(1)+'k' : 'R$'+valor;
+  const pct = Math.round((vendidos/window._state.total)*100);
+  document.getElementById('progress-fill').style.width = pct+'%';
+  document.getElementById('progress-pct').textContent  = pct+'% da meta';
+};
+
+window.renderRelatorio = function(){
+  const wrap = document.getElementById('relatorio-list');
+  const counts = {};
+  for(const [,b] of Object.entries(window._state.bilhetes)){
+    if(!counts[b.vendedor]) counts[b.vendedor]={qtd:0,total:0};
+    counts[b.vendedor].qtd++;
+    counts[b.vendedor].total += window._state.preco;
+  }
+  const sorted = Object.entries(counts).sort((a,b)=>b[1].qtd-a[1].qtd);
+  if(!sorted.length){
+    wrap.innerHTML='<div class="empty-state"><div class="empty-icon">🎟️</div><p>Nenhuma venda ainda.</p></div>';
+    return;
+  }
+  wrap.innerHTML = sorted.map(([nome,d],i)=>`
+    <div class="vend-card">
+      <div>
+        <div class="vend-name">${i===0?'🥇 ':i===1?'🥈 ':i===2?'🥉 ':''}${nome}</div>
+        <div class="vend-count">${d.qtd} bilhete${d.qtd>1?'s':''}</div>
+      </div>
+      <div class="vend-total">R$ ${d.total.toLocaleString('pt-BR')}</div>
+    </div>`).join('');
+};
+
+window.renderVendedoresCfg = function(){
+  document.getElementById('vendedor-list-cfg').innerHTML =
+    window._state.vendedores.map(v=>`
+      <div class="vendedor-row">
+        <span style="font-size:14px;font-weight:500">${v}</span>
+        <button class="btn-rm" onclick="removeVendedor('${v}')">✕</button>
+      </div>`).join('');
+};
+
+window.renderVendedorSelect = function(){
+  const sel = document.getElementById('login-select');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">— Selecione —</option>' +
+    window._state.vendedores.map(v=>`<option${v===cur?' selected':''}>${v}</option>`).join('');
+};
+
+// ─── CLICK / MODALS ───────────────────────────────────────────
+window.clickNum = function(num){
+  const b = window._state.bilhetes[num];
+  if(b){ openInfo(num,b); return; }
+  if(!window._session.nome){ showToast('⚠️ Faça login primeiro!','error'); return; }
+  window._selectedNum = num;
+  document.getElementById('modal-num-display').textContent = String(num).padStart(3,'0');
+  document.getElementById('comprador-nome').value='';
+  document.getElementById('comprador-tel').value='';
+  document.getElementById('modal-vender').classList.add('open');
+  setTimeout(()=>document.getElementById('comprador-nome').focus(),350);
+};
+
+window.viewerClick = function(num){
+  const b = window._state.bilhetes[num];
+  if(b){
+    showToast('❌ Número '+num+' já vendido!','error');
+  } else {
+    showToast('✅ Número '+num+' está livre! Fale com um vendedor.','success');
+  }
+};
+
+function openInfo(num,b){
+  window._selectedNum = num;
+  document.getElementById('info-num-display').textContent = String(num).padStart(3,'0');
+  const isViewer = window._session.modo==='comprador';
+  document.getElementById('btn-estornar').style.display = isViewer?'none':'block';
+  const rows=[['Comprador',b.comprador],['Vendedor',b.vendedor],['WhatsApp',b.tel||'—'],['Data/Hora',b.ts]];
+  document.getElementById('info-rows').innerHTML = rows.map(([k,v])=>
+    `<div class="info-row"><span class="info-key">${k}</span><span class="info-val">${v}</span></div>`).join('');
+  document.getElementById('modal-info').classList.add('open');
+}
+
+function showComprovante(num,nome,vendedor,ts){
+  document.getElementById('comp-num').textContent      = String(num).padStart(3,'0');
+  document.getElementById('comp-nome').textContent     = '👤 ' + nome;
+  document.getElementById('comp-vendedor').textContent = '🎟️ Vendedor: ' + vendedor;
+  document.getElementById('comp-data').textContent     = '📅 ' + ts;
+  document.getElementById('modal-comprovante').classList.add('open');
+}
+
+window.enviarWhats = function(){
+  const v = window._lastVenda;
+  if(!v) return;
+  const tel = v.tel.replace(/\D/g,'');
+  const msg = encodeURIComponent(
+    `✝ *Renova-me São Pedro — Rifa EJC* ✝\n\n`+
+    `🎟️ *Bilhete Nº ${String(v.num).padStart(3,'0')}*\n`+
+    `👤 Comprador: ${v.nome}\n`+
+    `🛒 Vendedor: ${v.vendedor}\n`+
+    `📅 Data: ${v.ts}\n\n`+
+    `_Guarde este comprovante! Boa sorte e Deus abençoe! 🙏_`
+  );
+  const url = tel ? `https://wa.me/55${tel}?text=${msg}` : `https://wa.me/?text=${msg}`;
+  window.open(url,'_blank');
+};
+
+window.closeModal = function(id){
+  document.getElementById(id).classList.remove('open');
+};
+
+// ─── LOGIN / LOGOUT ───────────────────────────────────────────
+window.setMode = function(modo,btn){
+  window._session.modo = modo;
+  document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('login-vendedor-wrap').style.display = modo==='vendedor'?'block':'none';
+};
+
+window.entrar = function(){
+  const modo = window._session.modo;
+  if(modo==='vendedor'){
+    const nome = document.getElementById('login-select').value;
+    if(!nome){ showToast('⚠️ Selecione seu nome!','error'); return; }
+    window._session.nome = nome;
+    document.getElementById('tab-meus').style.display='block';
+    document.getElementById('nav-config').style.display='block';
+    document.getElementById('viewer-banner').style.display='none';
+    document.getElementById('header-user').textContent = '👤 ' + nome + ' — Vendedor';
+  } else {
+    window._session.nome = '';
+    document.getElementById('tab-meus').style.display='none';
+    document.getElementById('nav-config').style.display='none';
+    document.getElementById('viewer-banner').style.display='block';
+    document.getElementById('header-user').textContent = '👁️ Modo visualização';
+  }
+  document.getElementById('login-screen').style.display='none';
+  renderGrid();
+};
+
+window.sair = function(){
+  document.getElementById('login-screen').style.display='flex';
+  window._session = { nome:'', modo:'vendedor' };
+};
+
+// ─── NAV / TABS ───────────────────────────────────────────────
+window.showPage = function(name,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  btn.classList.add('active');
+};
+
+window.setFilter = function(f,btn){
+  currentFilter = f;
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderGrid();
+};
+
+// ─── TOAST ────────────────────────────────────────────────────
+let toastTimer;
+window.showToast = function(msg,type=''){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast show '+type;
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),2800);
+};
+
+// Close modals on overlay click
+['modal-vender','modal-comprovante','modal-info'].forEach(id=>{
+  document.getElementById(id).addEventListener('click',e=>{
+    if(e.target===e.currentTarget) closeModal(id);
+  });
+});
+</script>
+
+</body>
+</html>
